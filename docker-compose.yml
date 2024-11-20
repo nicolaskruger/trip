@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:3000" # Map port 80 to Next.js default port 3000
+    volumes:
+      - ./frontend:/usr/src/app # Mount the frontend code for development
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3000" # Map port 8080 to NestJS default port 3000
+    volumes:
+      - ./backend:/usr/src/app # Mount the backend code for development
+    environment:
+      - NODE_ENV=development
