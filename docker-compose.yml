@@ -26,3 +26,16 @@ services:
       - .env # Load environment variables from the root .env file
     environment:
       - NODE_ENV=development
+  mongodb:
+    image: mongo:6.0 # MongoDB version
+    container_name: mongodb
+    ports:
+      - "27017:27017" # Expose MongoDB port
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: examplepassword
+    volumes:
+      - mongo-data:/data/db # Persist MongoDB data
+
+volumes:
+  mongo-data: # Volume for MongoDB data
