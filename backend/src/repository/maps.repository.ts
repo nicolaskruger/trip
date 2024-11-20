@@ -5,7 +5,8 @@ import { lastValueFrom } from 'rxjs';
 
 type RouteRequest = {
   origin: {
-    location: {
+    address: string;
+    location?: {
       latLng: {
         latitude: number;
         longitude: number;
@@ -13,7 +14,8 @@ type RouteRequest = {
     };
   };
   destination: {
-    location: {
+    address: string;
+    location?: {
       latLng: {
         latitude: number;
         longitude: number;
@@ -54,13 +56,23 @@ const API_KEY = process.env.GOOGLE_API_KEY;
 export class MapsRepository {
   constructor(private readonly httpService: HttpService) {}
   async calc({ destination, origin }: Way): Promise<MapRoute> {
-    const response = this.httpService.post<MapRoute>(URL, REQUEST_MAP_MOCK, {
-      headers: {
-        'X-Goog-FieldMask':
-          'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline',
-        'X-Goog-Api-Key': API_KEY,
+    const response = this.httpService.post<MapRoute>(
+      URL,
+      {
+        ...REQUEST_MAP_MOCK,
+        ...{
+          origin: { address: origin },
+          destination: { address: destination },
+        },
       },
-    });
+      {
+        headers: {
+          'X-Goog-FieldMask':
+            'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline',
+          'X-Goog-Api-Key': API_KEY,
+        },
+      },
+    );
     const { data } = await lastValueFrom(response);
     return data;
   }
