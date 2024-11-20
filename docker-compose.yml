@@ -35,7 +35,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: examplepassword
     volumes:
-      - mongo-data:/data/db # Persist MongoDB data
-
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 volumes:
   mongo-data: # Volume for MongoDB data
