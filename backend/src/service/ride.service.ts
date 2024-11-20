@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ESTIMATE } from './constantes';
+import { MapsRepository } from 'src/repository/maps.repository';
 
 export type Costumer = {
   customer_id: string;
@@ -34,6 +35,7 @@ type Estimate = {
 
 @Injectable()
 export class RideService {
+  constructor(private mapsRepository: MapsRepository) {}
   private validateNullableCostumer(costumer: Costumer) {
     if (!costumer) throw 'empty costumer';
     (['customer_id', 'destination', 'origin'] as (keyof Costumer)[]).forEach(
@@ -46,7 +48,7 @@ export class RideService {
     if (costumer.destination === costumer.origin) throw 'same address';
   }
 
-  private validateCostumer(costumer) {
+  private validateCostumer(costumer: Costumer) {
     [this.validateNullableCostumer, this.validateCostumerSameAddress].forEach(
       (callback) => callback(costumer),
     );
@@ -54,6 +56,7 @@ export class RideService {
 
   async estimate(costumer: Costumer): Promise<Estimate> {
     this.validateCostumer(costumer);
-    return ESTIMATE;
+    const routeResponse = await this.mapsRepository.calc(costumer);
+    return { ...ESTIMATE, routeResponse };
   }
 }
