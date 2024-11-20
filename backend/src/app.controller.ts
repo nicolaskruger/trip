@@ -7,6 +7,7 @@ export class AppController {
 
   @Get()
   getHello(): string {
+    return process.env.GOOGLE_API_KEY;
     return this.appService.getHello();
   }
 }

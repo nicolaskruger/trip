@@ -22,5 +22,7 @@ services:
       - "8080:3000" # Map port 8080 to NestJS default port 3000
     volumes:
       - ./backend:/usr/src/app # Mount the backend code for development
+    env_file:
+      - .env # Load environment variables from the root .env file
     environment:
       - NODE_ENV=development
