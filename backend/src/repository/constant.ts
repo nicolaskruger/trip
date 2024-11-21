@@ -1,19 +1,11 @@
-export const REQUEST_MAP_MOCK = {
+import { RouteRequest, Way } from './maps.repository';
+
+export const REQUEST_MAP = ({ destination, origin }: Way): RouteRequest => ({
   origin: {
-    location: {
-      latLng: {
-        latitude: 37.419734,
-        longitude: -122.0827784,
-      },
-    },
+    address: origin,
   },
   destination: {
-    location: {
-      latLng: {
-        latitude: 37.41767,
-        longitude: -122.079595,
-      },
-    },
+    address: destination,
   },
   travelMode: 'DRIVE',
   routingPreference: 'TRAFFIC_AWARE',
@@ -25,4 +17,4 @@ export const REQUEST_MAP_MOCK = {
   },
   languageCode: 'en-US',
   units: 'IMPERIAL',
-};
+});
