@@ -41,8 +41,61 @@ export type Estimate = {
   routeResponse: object;
 };
 
+type Order = {
+  customer_id: string;
+  origin: string;
+  destination: string;
+  distance: number;
+  duration: string;
+  driver: { id: number; name: string };
+  value: number;
+};
+
+type ConfirmError = {
+  code: number;
+  error_description: string;
+  error_code: 'INVALID_DATA' | 'DRIVER_NOT_FOUND' | 'INVALID_DISTANCE';
+};
+
 @Injectable()
 export class RideService {
+  private throwConfirmError(
+    code: number,
+    error_description: string,
+    error_code: 'INVALID_DATA' | 'DRIVER_NOT_FOUND' | 'INVALID_DISTANCE',
+  ) {
+    const error: ConfirmError = {
+      error_description,
+      code,
+      error_code,
+    };
+    throw error;
+  }
+
+  private validateNotNullOrder(order: Order) {
+    (['origin', 'destination', 'customer_id'] as (keyof Order)[]).forEach(
+      (key) => {
+        if (!order[key]) {
+          this.throwConfirmError(400, `empty ${key}`, 'INVALID_DATA');
+        }
+      },
+    );
+  }
+
+  private validateSameAddressOrder({ destination, origin }: Order) {
+    if (destination === origin) {
+      this.throwConfirmError(400, 'same address', 'INVALID_DATA');
+    }
+  }
+
+  private validateOrder(order: Order) {
+    this.validateNotNullOrder(order);
+    this.validateSameAddressOrder(order);
+  }
+
+  async confirm(order: Order) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     private mapsRepository: MapsRepository,
     private tripRepository: MongoTripRepository,
