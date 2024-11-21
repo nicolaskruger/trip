@@ -8,6 +8,7 @@ import { MapsRepository } from './repository/maps.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Driver, DriverSchema } from './repository/schema/driver.schema';
 import { MongoTripRepository } from './repository/mongo.trip.repository';
+import { PreOrder, PreOrderSchema } from './repository/schema/preorder.schema';
 
 @Module({
   imports: [
@@ -15,7 +16,10 @@ import { MongoTripRepository } from './repository/mongo.trip.repository';
     MongooseModule.forRoot(
       'mongodb://root:examplepassword@mongodb:27017/trip?authSource=admin',
     ),
-    MongooseModule.forFeature([{ name: Driver.name, schema: DriverSchema }]),
+    MongooseModule.forFeature([
+      { name: Driver.name, schema: DriverSchema },
+      { name: PreOrder.name, schema: PreOrderSchema },
+    ]),
   ],
   controllers: [AppController, RideController],
   providers: [AppService, RideService, MapsRepository, MongoTripRepository],

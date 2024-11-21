@@ -6,6 +6,7 @@ import {
 } from 'src/repository/maps.repository';
 import { MongoTripRepository } from 'src/repository/mongo.trip.repository';
 import { Driver } from 'src/repository/schema/driver.schema';
+import { SimpleDriverType } from 'src/repository/schema/preorder.schema';
 
 export type Costumer = {
   customer_id: string;
@@ -103,12 +104,34 @@ export class RideService {
     };
   }
 
+  private async savePreOrder({
+    estimate,
+    costumer,
+  }: {
+    estimate: Estimate;
+    costumer: Costumer;
+  }) {
+    this.tripRepository.updatePreOrder({
+      origin: costumer.origin,
+      destination: costumer.destination,
+      distance: estimate.distance,
+      duration: estimate.duration,
+      driver: estimate.options.map<SimpleDriverType>(({ id, name, value }) => ({
+        id,
+        name,
+        value,
+      })),
+    });
+  }
+
   async estimate(costumer: Costumer): Promise<Estimate> {
     this.validateCostumer(costumer);
     const routeResponse = await this.mapsRepository.calc(costumer);
-    const drivers = await this.tripRepository.pick(
+    const drivers = await this.tripRepository.pickDriver(
       this.getFirstRoute(routeResponse),
     );
-    return this.joinEstimate({ drivers, routeResponse });
+    const estimate = this.joinEstimate({ drivers, routeResponse });
+    await this.savePreOrder({ estimate, costumer });
+    return estimate;
   }
 }
