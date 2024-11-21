@@ -6,21 +6,9 @@ import { lastValueFrom } from 'rxjs';
 export type RouteRequest = {
   origin: {
     address: string;
-    location?: {
-      latLng: {
-        latitude: number;
-        longitude: number;
-      };
-    };
   };
   destination: {
     address: string;
-    location?: {
-      latLng: {
-        latitude: number;
-        longitude: number;
-      };
-    };
   };
   travelMode: string; // Pode ser transformado em um tipo literal como 'DRIVE' | 'WALK' | 'BICYCLE'
   routingPreference: string; // Também pode ser ajustado para um tipo literal, por exemplo, 'TRAFFIC_AWARE' | 'TRAFFIC_UNAWARE'
@@ -34,14 +22,23 @@ export type RouteRequest = {
   units: string; // Exemplo: 'IMPERIAL' | 'METRIC'
 };
 
-type MapRoute = {
-  routes: {
-    distanceMeters: number;
-    duration: string;
-    polyline: {
-      encodedPolyline: string;
-    };
-  }[];
+export type LatLng = {
+  latLng: {
+    latitude: number;
+    longitude: number;
+  };
+};
+
+export type Leg = { startLocation: LatLng; endLocation: LatLng };
+
+export type Route = {
+  distanceMeters: number;
+  duration: string;
+  legs: Leg[];
+};
+
+export type MapRoute = {
+  routes: Route[];
 };
 
 export type Way = {
@@ -53,8 +50,7 @@ const URL = 'https://routes.googleapis.com/directions/v2:computeRoutes';
 const API_KEY = process.env.GOOGLE_API_KEY;
 const HEADERS = {
   headers: {
-    'X-Goog-FieldMask':
-      'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline',
+    'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.legs',
     'X-Goog-Api-Key': API_KEY,
   },
 };

@@ -13,6 +13,8 @@ services:
       - NODE_ENV=development
     depends_on:
       - backend
+    networks:
+      - app-network
 
   backend:
     build:
@@ -26,6 +28,11 @@ services:
       - .env # Load environment variables from the root .env file
     environment:
       - NODE_ENV=development
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
   mongodb:
     image: mongo:6.0 # MongoDB version
     container_name: mongodb
@@ -36,5 +43,10 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: examplepassword
     volumes:
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
 volumes:
   mongo-data: # Volume for MongoDB data
