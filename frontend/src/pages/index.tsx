@@ -105,29 +105,22 @@ export default function Home() {
       {errorJ && <p className="text-red-700">error {errorJ}</p>}
       {estimate && (
         <>
-          <ul>
-            {estimate?.options.map(({ id, review, ...driver }) => {
+          <ul className="px-3 mt-2 space-y-2 mb-3">
+            {estimate?.options.map(({ id, name, value, vehicle }) => {
               return (
-                <li key={id}>
-                  <ul>
-                    {(
-                      [
-                        "name",
-                        "description",
-                        "vehicle",
-                        "value",
-                      ] as (keyof typeof driver)[]
-                    ).map((key) => (
-                      <li key={key}>
-                        {key}: {driver[key]}
-                      </li>
-                    ))}
-                    <li>
-                      review: <p className="text-purple-500">{review.rating}</p>{" "}
-                      {review.comment}
-                    </li>
-                  </ul>
-                  <button>select</button>
+                <li
+                  key={id}
+                  className="rounded-xl bg-slate-100 flex justify-between items-center px-3 py-2"
+                >
+                  <div>
+                    <p className="text-slate-950 ">{name}</p>
+                    <p className="text-green-600">$ {value}</p>
+                    <p className="text-gray-500">vehicle: {vehicle}</p>
+                  </div>
+
+                  <button className=" bg-gray-500 h-9 w-32 rounded-lg">
+                    select
+                  </button>
                 </li>
               );
             })}
