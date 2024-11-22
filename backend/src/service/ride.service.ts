@@ -105,7 +105,7 @@ export class RideService {
       this.throwConfirmError(406, 'invalid distance', 'INVALID_DISTANCE');
   }
 
-  private async validateOrder(orderDto: OrderDto) {
+  private validateOrder(orderDto: OrderDto) {
     this.validateNotNullOrder(orderDto);
     this.validateSameAddressOrder(orderDto);
     this.validateDriverOrder(orderDto);

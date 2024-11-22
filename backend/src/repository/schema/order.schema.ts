@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
 export type OrderType = {
   customer_id: string;
@@ -14,6 +15,16 @@ export type OrderType = {
 };
 
 @Schema()
+class Driver extends Document {
+  @Prop({ required: true })
+  id: number;
+  @Prop({ required: true })
+  name: string;
+}
+
+const DriverSchema = SchemaFactory.createForClass(Driver);
+
+@Schema()
 export class Order extends Document {
   @Prop({ required: true })
   customer_id: string;
@@ -25,11 +36,8 @@ export class Order extends Document {
   distance: number;
   @Prop({ required: true })
   duration: string;
-  @Prop({ required: true })
-  driver: {
-    id: number;
-    name: string;
-  };
+  @Prop({ type: DriverSchema, required: true })
+  driver: Driver;
   @Prop({ required: true })
   value: number;
 }

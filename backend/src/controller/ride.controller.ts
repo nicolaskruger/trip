@@ -44,7 +44,6 @@ export class RideController {
     } catch (error) {
       const { code, ..._error } = {
         code: 400,
-        msg: 'something happen',
         ...error,
       } as ConfirmError;
       return res.status(code).json(_error);
