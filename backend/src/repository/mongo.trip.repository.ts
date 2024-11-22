@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { PreOrder, PreOrderType } from './schema/preorder.schema';
 import { Order, OrderType } from './schema/order.schema';
+import { RidesQuery } from 'src/service/ride.service';
 
 type FindPreOrderQuery = {
   origin: string;
@@ -34,6 +35,10 @@ export class MongoTripRepository {
     return this.driverModel.findOne({ name: driver.name, id: driver.id });
   }
 
+  async findDriverById(id: number) {
+    return this.driverModel.findOne({ id });
+  }
+
   async updatePreOrder(preOrder: PreOrderType) {
     return this.preOrderModel.updateOne(
       {
@@ -49,7 +54,16 @@ export class MongoTripRepository {
     return this.preOrderModel.findOne({ origin, destination });
   }
 
+  async findOrderByRidesQuery({ customer_id, driver_id }: RidesQuery) {
+    if (driver_id)
+      return this.orderModel.find({ customer_id, 'driver.id': driver_id });
+    return this.orderModel.find({ customer_id });
+  }
+
   async saveOrder(order: OrderType) {
-    return this.orderModel.create(order);
+    const [data] = await this.orderModel.find().sort({ id: -1 });
+    let id = 1;
+    if (data) id = data.id + 1;
+    return this.orderModel.create({ ...order, id, date: new Date() });
   }
 }

@@ -51,10 +51,17 @@ type Order = {
   value: number;
 };
 
+type ErrorCode =
+  | 'INVALID_DATA'
+  | 'DRIVER_NOT_FOUND'
+  | 'INVALID_DISTANCE'
+  | 'INVALID_DRIVER'
+  | 'NO_RIDES_FOUND';
+
 type ConfirmError = {
   code: number;
   error_description: string;
-  error_code: 'INVALID_DATA' | 'DRIVER_NOT_FOUND' | 'INVALID_DISTANCE';
+  error_code: ErrorCode;
 };
 
 type OrderDto = {
@@ -62,12 +69,59 @@ type OrderDto = {
   driver: Driver;
 };
 
+export type RidesQuery = { customer_id: string; driver_id?: number };
+
+type RideDTO = { query: RidesQuery; driver: Driver };
+
+type Ride = {
+  id: number;
+  date: Date;
+  origin: string;
+  destination: string;
+  distance: number;
+  duration: string;
+  driver: {
+    id: number;
+    name: string;
+  };
+  value: number;
+};
+
+type RidesInfo = {
+  customer_id: string;
+  rides: Ride[];
+};
+
 @Injectable()
 export class RideService {
-  private throwConfirmError(
+  private validateRides({ query, driver }: RideDTO) {
+    const validateNullable = () => {
+      if (!query.customer_id)
+        this.throwRidesError(400, `empty customerId`, 'INVALID_DATA');
+    };
+    const validateDriver = () => {
+      if (query.driver_id && !driver)
+        this.throwRidesError(400, 'invalid driver', 'INVALID_DRIVER');
+    };
+
+    [validateNullable, validateDriver].forEach((callback) => callback());
+  }
+
+  async rides(query: RidesQuery): Promise<RidesInfo> {
+    const driver = await this.tripRepository.findDriverById(query.driver_id);
+    this.validateRides({ query, driver });
+    const rides = await this.tripRepository.findOrderByRidesQuery(query);
+    if (!rides || rides.length === 0)
+      this.throwRidesError(404, 'no rides found', 'NO_RIDES_FOUND');
+    return {
+      customer_id: query.customer_id,
+      rides,
+    };
+  }
+  private throwRidesError(
     code: number,
     error_description: string,
-    error_code: 'INVALID_DATA' | 'DRIVER_NOT_FOUND' | 'INVALID_DISTANCE',
+    error_code: ErrorCode,
   ) {
     const error: ConfirmError = {
       error_description,
@@ -81,7 +135,7 @@ export class RideService {
     (['origin', 'destination', 'customer_id'] as (keyof Order)[]).forEach(
       (key) => {
         if (!order[key]) {
-          this.throwConfirmError(400, `empty ${key}`, 'INVALID_DATA');
+          this.throwRidesError(400, `empty ${key}`, 'INVALID_DATA');
         }
       },
     );
@@ -91,18 +145,18 @@ export class RideService {
     order: { destination, origin },
   }: OrderDto) {
     if (destination === origin) {
-      this.throwConfirmError(400, 'same address', 'INVALID_DATA');
+      this.throwRidesError(400, 'same address', 'INVALID_DATA');
     }
   }
 
   private validateDriverOrder({ order, driver }: OrderDto) {
     const throwDriverError = (error_description: string) =>
-      this.throwConfirmError(404, error_description, 'DRIVER_NOT_FOUND');
+      this.throwRidesError(404, error_description, 'DRIVER_NOT_FOUND');
     if (!order.driver || !driver) throwDriverError('missing driver');
   }
-  validateDistanceOrder({ driver, order }: OrderDto) {
+  private validateDistanceOrder({ driver, order }: OrderDto) {
     if (order.distance < driver.minKm * 1000)
-      this.throwConfirmError(406, 'invalid distance', 'INVALID_DISTANCE');
+      this.throwRidesError(406, 'invalid distance', 'INVALID_DISTANCE');
   }
 
   private validateOrder(orderDto: OrderDto) {
@@ -116,7 +170,7 @@ export class RideService {
     const driver = await this.tripRepository.findDriver(order.driver);
     const orderDto: OrderDto = { order, driver };
     this.validateOrder(orderDto);
-    this.tripRepository.saveOrder(order);
+    await this.tripRepository.saveOrder(order);
   }
   constructor(
     private mapsRepository: MapsRepository,

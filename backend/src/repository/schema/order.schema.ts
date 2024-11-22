@@ -27,6 +27,8 @@ const DriverSchema = SchemaFactory.createForClass(Driver);
 @Schema()
 export class Order extends Document {
   @Prop({ required: true })
+  id: number;
+  @Prop({ required: true })
   customer_id: string;
   @Prop({ required: true })
   origin: string;
@@ -38,6 +40,8 @@ export class Order extends Document {
   duration: string;
   @Prop({ type: DriverSchema, required: true })
   driver: Driver;
+  @Prop({ required: true })
+  date: Date;
   @Prop({ required: true })
   value: number;
 }
