@@ -1,14 +1,44 @@
+import { Maps } from "@/components/maps";
 import axios, { AxiosError } from "axios";
 import { FormEvent, useState } from "react";
 
 const BACKEND_URL = "http://localhost:8080/ride/";
+
+export type Option = {
+  id: number;
+  name: string;
+  description: string;
+  vehicle: string;
+  review: {
+    rating: number;
+    comment: string;
+  };
+  value: number;
+};
+
+export type Estimate = {
+  origin: {
+    latitude: number;
+    longitude: number;
+  };
+  destination: {
+    latitude: number;
+    longitude: number;
+  };
+  distance: number;
+  duration: string;
+  options: Option[];
+  routeResponse: object;
+};
 
 export default function Home() {
   const [customer_id, setCustomer] = useState("");
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
 
-  const [success, setSuccess] = useState("");
+  const [estimate, setEstimate] = useState<Estimate>();
+
+  const [loading, setLoading] = useState(false);
 
   const [errorJ, setError] = useState("");
 
@@ -16,15 +46,17 @@ export default function Home() {
     event.preventDefault();
     event.stopPropagation();
     try {
+      setLoading(true);
       const { data } = await axios.post(BACKEND_URL + "estimate", {
         customer_id,
         origin,
         destination,
       });
-      setSuccess(JSON.stringify(data));
+      setEstimate(data);
     } catch (error) {
       if (error instanceof AxiosError) {
         console.log(error);
+        setLoading(false);
         setError(JSON.stringify(error.response?.data));
       }
     }
@@ -63,8 +95,40 @@ export default function Home() {
         />
         <button>submit</button>
       </form>
-      <p>success {success}</p>
-      <p>error {errorJ}</p>
+      {loading && <p className="text-yellow-500">loading...</p>}
+      {errorJ && <p className="text-red-700">error {errorJ}</p>}
+      {estimate && (
+        <>
+          <Maps {...{ destination, origin }} />
+          <ul>
+            {estimate?.options.map(({ id, review, ...driver }) => {
+              return (
+                <li key={id}>
+                  <ul>
+                    {(
+                      [
+                        "name",
+                        "description",
+                        "vehicle",
+                        "value",
+                      ] as (keyof typeof driver)[]
+                    ).map((key) => (
+                      <li key={key}>
+                        {key}: {driver[key]}
+                      </li>
+                    ))}
+                    <li>
+                      review: <p className="text-purple-500">{review.rating}</p>{" "}
+                      {review.comment}
+                    </li>
+                  </ul>
+                  <button>select</button>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
     </main>
   );
 }
