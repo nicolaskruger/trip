@@ -4,6 +4,11 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { PreOrder, PreOrderType } from './schema/preorder.schema';
 
+type FindPreOrderQuery = {
+  origin: string;
+  destination: string;
+};
+
 @Injectable()
 export class MongoTripRepository {
   constructor(
@@ -22,6 +27,11 @@ export class MongoTripRepository {
       .exec();
   }
 
+  async findDriver(driver: { name: string; id: number }) {
+    if (!driver) return null;
+    return this.driverModel.findOne({ name: driver.name, id: driver.id });
+  }
+
   async updatePreOrder(preOrder: PreOrderType) {
     return this.preOrderModel.updateOne(
       {
@@ -31,5 +41,9 @@ export class MongoTripRepository {
       preOrder,
       { upsert: true },
     );
+  }
+
+  async findPreOrder({ origin, destination }: FindPreOrderQuery) {
+    return this.preOrderModel.findOne({ origin, destination });
   }
 }

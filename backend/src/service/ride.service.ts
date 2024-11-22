@@ -57,6 +57,11 @@ type ConfirmError = {
   error_code: 'INVALID_DATA' | 'DRIVER_NOT_FOUND' | 'INVALID_DISTANCE';
 };
 
+type OrderDto = {
+  order: Order;
+  driver: Driver;
+};
+
 @Injectable()
 export class RideService {
   private throwConfirmError(
@@ -72,7 +77,7 @@ export class RideService {
     throw error;
   }
 
-  private validateNotNullOrder(order: Order) {
+  private validateNotNullOrder({ order }: OrderDto) {
     (['origin', 'destination', 'customer_id'] as (keyof Order)[]).forEach(
       (key) => {
         if (!order[key]) {
@@ -82,18 +87,35 @@ export class RideService {
     );
   }
 
-  private validateSameAddressOrder({ destination, origin }: Order) {
+  private validateSameAddressOrder({
+    order: { destination, origin },
+  }: OrderDto) {
     if (destination === origin) {
       this.throwConfirmError(400, 'same address', 'INVALID_DATA');
     }
   }
 
-  private validateOrder(order: Order) {
-    this.validateNotNullOrder(order);
-    this.validateSameAddressOrder(order);
+  private validateDriverOrder({ order, driver }: OrderDto) {
+    const throwDriverError = (error_description: string) =>
+      this.throwConfirmError(404, error_description, 'DRIVER_NOT_FOUND');
+    if (!order.driver || !driver) throwDriverError('missing driver');
+  }
+  validateDistanceOrder({ driver, order }: OrderDto) {
+    if (order.distance < driver.minKm * 1000)
+      this.throwConfirmError(406, 'invalid distance', 'INVALID_DISTANCE');
+  }
+
+  private async validateOrder(orderDto: OrderDto) {
+    this.validateNotNullOrder(orderDto);
+    this.validateSameAddressOrder(orderDto);
+    this.validateDriverOrder(orderDto);
+    this.validateDistanceOrder(orderDto);
   }
 
   async confirm(order: Order) {
+    const driver = await this.tripRepository.findDriver(order.driver);
+    const orderDto: OrderDto = { order, driver };
+    this.validateOrder(orderDto);
     throw new Error('Method not implemented.');
   }
   constructor(
