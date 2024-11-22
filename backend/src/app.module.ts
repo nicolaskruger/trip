@@ -9,6 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Driver, DriverSchema } from './repository/schema/driver.schema';
 import { MongoTripRepository } from './repository/mongo.trip.repository';
 import { PreOrder, PreOrderSchema } from './repository/schema/preorder.schema';
+import { Order, OrderSchema } from './repository/schema/order.schema';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PreOrder, PreOrderSchema } from './repository/schema/preorder.schema';
     MongooseModule.forFeature([
       { name: Driver.name, schema: DriverSchema },
       { name: PreOrder.name, schema: PreOrderSchema },
+      { name: Order.name, schema: OrderSchema },
     ]),
   ],
   controllers: [AppController, RideController],

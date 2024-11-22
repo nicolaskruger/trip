@@ -116,7 +116,7 @@ export class RideService {
     const driver = await this.tripRepository.findDriver(order.driver);
     const orderDto: OrderDto = { order, driver };
     this.validateOrder(orderDto);
-    throw new Error('Method not implemented.');
+    this.tripRepository.saveOrder(order);
   }
   constructor(
     private mapsRepository: MapsRepository,

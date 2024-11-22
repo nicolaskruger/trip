@@ -3,6 +3,7 @@ import { Driver } from './schema/driver.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { PreOrder, PreOrderType } from './schema/preorder.schema';
+import { Order, OrderType } from './schema/order.schema';
 
 type FindPreOrderQuery = {
   origin: string;
@@ -14,6 +15,7 @@ export class MongoTripRepository {
   constructor(
     @InjectModel(Driver.name) private driverModel: Model<Driver>,
     @InjectModel(PreOrder.name) private preOrderModel: Model<PreOrder>,
+    @InjectModel(Order.name) private orderModel: Model<Order>,
   ) {}
 
   async pickDriver({
@@ -45,5 +47,9 @@ export class MongoTripRepository {
 
   async findPreOrder({ origin, destination }: FindPreOrderQuery) {
     return this.preOrderModel.findOne({ origin, destination });
+  }
+
+  async saveOrder(order: OrderType) {
+    return this.orderModel.create(order);
   }
 }
