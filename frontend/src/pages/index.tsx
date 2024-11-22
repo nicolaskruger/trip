@@ -52,6 +52,7 @@ export default function Home() {
         origin,
         destination,
       });
+      setLoading(false);
       setEstimate(data);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -64,8 +65,12 @@ export default function Home() {
 
   return (
     <main>
-      <h1>trip</h1>
-      <form onSubmit={handleSubmit} action="submit" className="flex flex-col">
+      <h1 className=" pl-3 py-5 text-xl">trip</h1>
+      <form
+        onSubmit={handleSubmit}
+        action="submit"
+        className="px-3 flex flex-col space-y-2"
+      >
         <label htmlFor="customer_id">customer_id:</label>
         <input
           value={customer_id}
@@ -93,13 +98,13 @@ export default function Home() {
           className="text-slate-900"
           onChange={(e) => setDestination(e.target.value)}
         />
-        <button>submit</button>
+        <Maps {...{ destination, origin }} />
+        <button className="bg-pink-700">submit</button>
       </form>
-      {loading && <p className="text-yellow-500">loading...</p>}
+      {loading && <p className="p-3 text-yellow-500">loading...</p>}
       {errorJ && <p className="text-red-700">error {errorJ}</p>}
       {estimate && (
         <>
-          <Maps {...{ destination, origin }} />
           <ul>
             {estimate?.options.map(({ id, review, ...driver }) => {
               return (

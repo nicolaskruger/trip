@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 
 const containerStyle = {
   width: "100%",
-  height: "500px",
+  height: "250px",
 };
 
 const center = {
@@ -46,14 +46,16 @@ const Maps = ({ origin, destination }: Way) => {
 
   return (
     <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ""}>
-      <GoogleMap
-        mapContainerStyle={containerStyle}
-        center={center}
-        zoom={10}
-        onLoad={(map) => {
-          mapRef.current = map;
-        }}
-      />
+      <div className="">
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={center}
+          zoom={10}
+          onLoad={(map) => {
+            mapRef.current = map;
+          }}
+        />
+      </div>
     </LoadScript>
   );
 };
