@@ -23,6 +23,12 @@ type Operation = {
   rides: Ride[];
 };
 
+const formatSeconds = (seconds: string) => {
+  const milliseconds = Number(seconds.replace("s", "")) * 1000;
+  const date = new Date(milliseconds);
+  return date.toISOString().substr(11, 8); // Retorna "hh:mm:ss"
+};
+
 export default function History() {
   const {
     query: { customer_id },
@@ -71,22 +77,24 @@ export default function History() {
   };
 
   return (
-    <main>
-      <h1>History</h1>
-      <label htmlFor="customer_id">customer_id</label>
-      <input
-        type="text"
-        name="customer_id"
-        id="customer_id"
-        value={customer}
-        className="text-slate-900"
-        onChange={handleChange}
-      />
+    <main className="px-3">
+      <h1 className="py-5 text-xl">History</h1>
+      <div className="flex flex-col space-y-3 mb-3">
+        <label htmlFor="customer_id">customer_id</label>
+        <input
+          type="text"
+          name="customer_id"
+          id="customer_id"
+          value={customer}
+          className="text-slate-900"
+          onChange={handleChange}
+        />
+      </div>
       {loading && <p className="text-yellow-700">loading...</p>}
       {errorJ && <p className="text-red-600">{errorJ}</p>}
       {operation && operation.rides && (
         <>
-          <ul>
+          <ul className="flex space-x-2">
             {operation.rides
               .reduce(
                 (acc, curr) =>
@@ -98,23 +106,26 @@ export default function History() {
               .map((name) => (
                 <li key={name}>
                   <button
+                    className="flex items-baseline space-x-2"
                     onClick={() => {
                       if (filter.includes(name))
                         setFilter(filter.filter((val) => val !== name));
                       else setFilter([...filter, name]);
                     }}
                   >
-                    <p>{name}</p>
                     <div
-                      className="w-3 bg-slate-50 h-3 rounded-sm data-[active=true]:bg-red-500"
+                      className=" w-3 bg-slate-50 h-3 rounded-sm data-[active=true]:bg-red-500"
                       data-active={filter.includes(name)}
                     ></div>
+                    <p>{name}</p>
                   </button>
                 </li>
               ))}
-            <button onClick={() => setFilter([])}>clear filter</button>
+            <button className="text-purple-500" onClick={() => setFilter([])}>
+              clear filter
+            </button>
           </ul>
-          <ul>
+          <ul className="flex flex-col space-y-2">
             {operation.rides
               .sort((a, b) => b.date.localeCompare(a.date))
               .filter(
@@ -132,14 +143,34 @@ export default function History() {
                   duration,
                   value,
                 }) => (
-                  <li key={id}>
-                    <p>{name}</p>
-                    <p>{date}</p>
-                    <p>origin: {origin}</p>
-                    <p>destination: {destination}</p>
-                    <p>distance: {distance}</p>
-                    <p>duration: {duration}</p>
-                    <p>value: {value}</p>
+                  <li className="bg-slate-50 rounded-lg p-3 space-y-1" key={id}>
+                    <div className="flex justify-between">
+                      <p className="text-slate-900">{name}</p>
+                      <p className="text-slate-900">
+                        {new Date(date).toLocaleDateString()}{" "}
+                        {new Date(date).toLocaleTimeString()}
+                      </p>
+                    </div>
+                    <div className="flex justify-between">
+                      <div>
+                        <p className="text-slate-900">
+                          {(distance / 1000).toFixed(2)} km
+                        </p>
+                        <p className="text-slate-900">
+                          {formatSeconds(duration)}
+                        </p>
+                      </div>
+                      <p className="text-green-700">$ {value.toFixed()}</p>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="text-slate-900">{origin}</p>
+                      <div className="px-4 grow flex items-center">
+                        <div className="w-2 h-2 bg-slate-200 rounded-full " />
+                        <div className="h-0.5 grow bg-slate-200 " />
+                        <div className="w-2 h-2 bg-slate-200 rounded-full " />
+                      </div>
+                      <p className="text-slate-900">{destination}</p>
+                    </div>
                   </li>
                 )
               )}
