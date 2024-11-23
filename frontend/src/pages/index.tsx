@@ -1,6 +1,7 @@
 import { Maps } from "@/components/maps";
 import axios, { AxiosError } from "axios";
-import { FormEvent, useState } from "react";
+import { useRouter } from "next/router";
+import { FormEvent, useCallback, useState } from "react";
 
 const BACKEND_URL = "http://localhost:8080/ride/";
 
@@ -31,6 +32,19 @@ export type Estimate = {
   routeResponse: object;
 };
 
+type Confirm = {
+  customer_id: string;
+  origin: string;
+  destination: string;
+  distance: number;
+  duration: string;
+  driver: {
+    id: number;
+    name: string;
+  };
+  value: number;
+};
+
 export default function Home() {
   const [customer_id, setCustomer] = useState("");
   const [origin, setOrigin] = useState("");
@@ -41,6 +55,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const [errorJ, setError] = useState("");
+
+  const { push } = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,6 +78,34 @@ export default function Home() {
       }
     }
   };
+
+  const confirm = useCallback(
+    async (driver: Option) => {
+      const confirmDto: Confirm = {
+        customer_id,
+        destination,
+        origin,
+        driver,
+        value: driver.value,
+        distance: estimate!.distance,
+        duration: estimate!.duration,
+      };
+
+      try {
+        setLoading(true);
+        await axios.patch(BACKEND_URL + "confirm", confirmDto);
+        setLoading(false);
+        push(`/history?customer_id=${customer_id}`);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.log(error);
+          setLoading(false);
+          setError(JSON.stringify(error.response?.data));
+        }
+      }
+    },
+    [origin, destination, estimate, customer_id]
+  );
 
   return (
     <main>
@@ -106,7 +150,14 @@ export default function Home() {
       {estimate && (
         <>
           <ul className="px-3 mt-2 space-y-2 mb-3">
-            {estimate?.options.map(({ id, name, value, vehicle }) => {
+            {estimate?.options.map((driver) => {
+              const {
+                id,
+                name,
+                value,
+                vehicle,
+                review: { rating },
+              } = driver;
               return (
                 <li
                   key={id}
@@ -116,9 +167,13 @@ export default function Home() {
                     <p className="text-slate-950 ">{name}</p>
                     <p className="text-green-600">$ {value}</p>
                     <p className="text-gray-500">vehicle: {vehicle}</p>
+                    <p className="text-orange-600">{"☆".repeat(rating)}</p>
                   </div>
 
-                  <button className=" bg-gray-500 h-9 w-32 rounded-lg">
+                  <button
+                    className=" bg-gray-500 h-9 w-32 rounded-lg"
+                    onClick={() => confirm(driver)}
+                  >
                     select
                   </button>
                 </li>
