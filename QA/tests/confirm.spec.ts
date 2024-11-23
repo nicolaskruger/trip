@@ -27,8 +27,8 @@ const getRequest = (): Request => ({
   distance: 450,
   duration: "5h 30m",
   driver: {
-    id: 789,
-    name: "John Doe",
+    id: 1,
+    name: "Homer Simpson",
   },
   value: 200.5,
 });
@@ -85,4 +85,12 @@ test("empty invalid driver", async ({ request }) => {
   expect(res.status()).toBe(404);
   const json: ErrorRes = await res.json();
   expect(json.error_code).toBe("DRIVER_NOT_FOUND");
+});
+test("empty invalid distance", async ({ request }) => {
+  const req = getRequest();
+  req.distance = 200;
+  const res = await request.patch(URL, { data: req });
+  expect(res.status()).toBe(406);
+  const json: ErrorRes = await res.json();
+  expect(json.error_code).toBe("INVALID_DISTANCE");
 });
