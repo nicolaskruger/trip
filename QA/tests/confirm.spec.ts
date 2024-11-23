@@ -2,6 +2,10 @@ import test, { expect } from "@playwright/test";
 
 const URL = "http://localhost:8080/ride/confirm";
 
+type Success = {
+  success: true;
+};
+
 type ErrorRes = {
   error_code: "INVALID_DATA";
   error_description: string;
@@ -24,7 +28,7 @@ const getRequest = (): Request => ({
   customer_id: "12345",
   origin: "New York",
   destination: "Los Angeles",
-  distance: 450,
+  distance: 10000,
   duration: "5h 30m",
   driver: {
     id: 1,
@@ -93,4 +97,12 @@ test("empty invalid distance", async ({ request }) => {
   expect(res.status()).toBe(406);
   const json: ErrorRes = await res.json();
   expect(json.error_code).toBe("INVALID_DISTANCE");
+});
+
+test("success", async ({ request }) => {
+  const req = getRequest();
+  const res = await request.patch(URL, { data: req });
+  expect(res.status()).toBe(200);
+  const json: Success = await res.json();
+  expect(json.success).toBe(true);
 });
