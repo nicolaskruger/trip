@@ -1,8 +1,8 @@
+import { InputSelector } from "@/components/input-selector";
 import { Maps } from "@/components/maps";
-import { useSuggestions } from "@/hooks/use_suggestions";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 
 const BACKEND_URL = "http://localhost:8080/ride/";
 
@@ -107,20 +107,6 @@ export default function Home() {
     },
     [origin, destination, estimate, customer_id]
   );
-  const [maps, setMaps] = useState(false);
-
-  const [originsSuggestion, clearOriginSuggestions] = useSuggestions(origin);
-
-  useEffect(() => {
-    setCursor(0);
-  }, [originsSuggestion]);
-
-  const [cursor, setCursor] = useState(0);
-
-  const [[destinationSuggestion], clearDestinationSuggestions] = useSuggestions(
-    destination,
-    maps
-  );
 
   return (
     <main className="px-3">
@@ -140,78 +126,11 @@ export default function Home() {
           className="text-slate-900"
         />
         <label htmlFor="origin">origin:</label>
-        <div className="flex flex-col">
-          <input
-            onFocus={() => clearDestinationSuggestions()}
-            type="text"
-            name="origin"
-            id="origin"
-            value={origin}
-            onKeyDown={(e) => {
-              const sw = {
-                ArrowDown: () =>
-                  setCursor((cursor) =>
-                    originsSuggestion.length - 1 === cursor
-                      ? cursor
-                      : cursor + 1
-                  ),
-                ArrowUp: () =>
-                  setCursor((cursor) => (0 === cursor ? cursor : cursor - 1)),
-                Enter: () => setOrigin(originsSuggestion[cursor]),
-                default: () => {},
-              };
-              sw[Object.keys(sw).includes(e.key) ? e.key : "default"]();
-            }}
-            className="text-slate-900"
-            onChange={(e) => setOrigin(e.target.value)}
-          />
-          <div className="relative ">
-            <div className="absolute w-full z-10">
-              {originsSuggestion.map((suggestion, i) => (
-                <button
-                  key={suggestion}
-                  data-cursor={i === cursor}
-                  className="data-[cursor=true]:bg-slate-400 py-0.5 text-left bg-slate-300 text-slate-900 invisible data-[show=true]:visible hover:bg-slate-400 w-full"
-                  data-show={!!suggestion && origin !== originsSuggestion[0]}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    setOrigin(suggestion);
-                  }}
-                >
-                  {suggestion || "no suggestions"}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <InputSelector value={origin} setValue={setOrigin} />
 
         <label htmlFor="destination">destination:</label>
-        <div className="flex flex-col">
-          <input
-            onFocus={() => clearOriginSuggestions()}
-            type="text"
-            name="destination"
-            id="destination"
-            value={destination}
-            className="text-slate-900"
-            onChange={(e) => setDestination(e.target.value)}
-          />
-          <button
-            className="py-1 text-left bg-slate-900 invisible data-[show=true]:visible hover:bg-slate-800"
-            data-show={
-              !!destinationSuggestion && destination !== destinationSuggestion
-            }
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              setDestination(destinationSuggestion);
-            }}
-          >
-            {destinationSuggestion || "no suggestions"}
-          </button>
-        </div>
-        <Maps onLoad={() => setMaps(true)} {...{ destination, origin }} />
+        <InputSelector value={destination} setValue={setDestination} />
+        <Maps {...{ destination, origin }} />
 
         <button className="bg-pink-700">submit</button>
       </form>
