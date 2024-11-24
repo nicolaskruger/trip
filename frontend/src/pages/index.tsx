@@ -1,8 +1,8 @@
 import { Maps } from "@/components/maps";
+import { useSuggestions } from "@/hooks/use_suggestions";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
-import { FormEvent, useCallback, useEffect, useState } from "react";
-import { getGeocode } from "use-places-autocomplete";
+import { FormEvent, useCallback, useState } from "react";
 
 const BACKEND_URL = "http://localhost:8080/ride/";
 
@@ -109,18 +109,15 @@ export default function Home() {
   );
   const [maps, setMaps] = useState(false);
 
-  const [originSuggestions, setOriginSuggestion] = useState<string[]>([]);
+  const [[originSuggestion], clearOriginSuggestions] = useSuggestions(
+    origin,
+    maps
+  );
 
-  useEffect(() => {
-    if (maps)
-      (async () => {
-        const results = await getGeocode({ address: origin });
-        setOriginSuggestion(
-          results.map(({ formatted_address }) => formatted_address)
-        );
-        console.log(results);
-      })();
-  }, [origin, maps]);
+  const [[destinationSuggestion], clearDestinationSuggestions] = useSuggestions(
+    destination,
+    maps
+  );
 
   return (
     <main className="px-3">
@@ -140,27 +137,58 @@ export default function Home() {
           className="text-slate-900"
         />
         <label htmlFor="origin">origin:</label>
-        <input
-          type="text"
-          name="origin"
-          id="origin"
-          value={origin}
-          className="text-slate-900"
-          onChange={(e) => setOrigin(e.target.value)}
-        />
-        {originSuggestions.map((suggestion) => (
-          <div key={suggestion}>{suggestion}</div>
-        ))}
+        <div className="flex flex-col">
+          <input
+            onFocus={() => clearDestinationSuggestions()}
+            type="text"
+            name="origin"
+            id="origin"
+            value={origin}
+            className="text-slate-900"
+            onChange={(e) => setOrigin(e.target.value)}
+          />
+          <div className="relative ">
+            <button
+              className="absolute py-1 text-left bg-slate-900 invisible data-[show=true]:visible hover:bg-slate-800 w-full"
+              data-show={!!originSuggestion && origin !== originSuggestion}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                setOrigin(originSuggestion);
+              }}
+            >
+              {originSuggestion || "no suggestions"}
+            </button>
+          </div>
+        </div>
+
         <label htmlFor="destination">destination:</label>
-        <input
-          type="text"
-          name="destination"
-          id="destination"
-          value={destination}
-          className="text-slate-900"
-          onChange={(e) => setDestination(e.target.value)}
-        />
+        <div className="flex flex-col">
+          <input
+            onFocus={() => clearOriginSuggestions()}
+            type="text"
+            name="destination"
+            id="destination"
+            value={destination}
+            className="text-slate-900"
+            onChange={(e) => setDestination(e.target.value)}
+          />
+          <button
+            className="py-1 text-left bg-slate-900 invisible data-[show=true]:visible hover:bg-slate-800"
+            data-show={
+              !!destinationSuggestion && destination !== destinationSuggestion
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              setDestination(destinationSuggestion);
+            }}
+          >
+            {destinationSuggestion || "no suggestions"}
+          </button>
+        </div>
         <Maps onLoad={() => setMaps(true)} {...{ destination, origin }} />
+
         <button className="bg-pink-700">submit</button>
       </form>
       {loading && <p className="p-3 text-yellow-500">loading...</p>}
