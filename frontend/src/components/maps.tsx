@@ -45,10 +45,7 @@ const Maps = ({ origin, destination, onLoad }: HTMLProps<LoadScript> & Way) => {
   }, [origin, destination]);
 
   return (
-    <LoadScript
-      onLoad={onLoad}
-      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ""}
-    >
+    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ""}>
       <div className="">
         <GoogleMap
           mapContainerStyle={containerStyle}

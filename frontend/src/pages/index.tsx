@@ -2,7 +2,7 @@ import { Maps } from "@/components/maps";
 import { useSuggestions } from "@/hooks/use_suggestions";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
-import { FormEvent, useCallback, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 
 const BACKEND_URL = "http://localhost:8080/ride/";
 
@@ -109,10 +109,13 @@ export default function Home() {
   );
   const [maps, setMaps] = useState(false);
 
-  const [[originSuggestion], clearOriginSuggestions] = useSuggestions(
-    origin,
-    maps
-  );
+  const [originsSuggestion, clearOriginSuggestions] = useSuggestions(origin);
+
+  useEffect(() => {
+    setCursor(0);
+  }, [originsSuggestion]);
+
+  const [cursor, setCursor] = useState(0);
 
   const [[destinationSuggestion], clearDestinationSuggestions] = useSuggestions(
     destination,
@@ -144,21 +147,42 @@ export default function Home() {
             name="origin"
             id="origin"
             value={origin}
+            onKeyDown={(e) => {
+              const sw = {
+                ArrowDown: () =>
+                  setCursor((cursor) =>
+                    originsSuggestion.length - 1 === cursor
+                      ? cursor
+                      : cursor + 1
+                  ),
+                ArrowUp: () =>
+                  setCursor((cursor) => (0 === cursor ? cursor : cursor - 1)),
+                Enter: () => setOrigin(originsSuggestion[cursor]),
+                default: () => {},
+              };
+              sw[Object.keys(sw).includes(e.key) ? e.key : "default"]();
+            }}
             className="text-slate-900"
             onChange={(e) => setOrigin(e.target.value)}
           />
           <div className="relative ">
-            <button
-              className="absolute py-1 text-left bg-slate-900 invisible data-[show=true]:visible hover:bg-slate-800 w-full"
-              data-show={!!originSuggestion && origin !== originSuggestion}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                setOrigin(originSuggestion);
-              }}
-            >
-              {originSuggestion || "no suggestions"}
-            </button>
+            <div className="absolute w-full z-10">
+              {originsSuggestion.map((suggestion, i) => (
+                <button
+                  key={suggestion}
+                  data-cursor={i === cursor}
+                  className="data-[cursor=true]:bg-slate-400 py-0.5 text-left bg-slate-300 text-slate-900 invisible data-[show=true]:visible hover:bg-slate-400 w-full"
+                  data-show={!!suggestion && origin !== originsSuggestion[0]}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setOrigin(suggestion);
+                  }}
+                >
+                  {suggestion || "no suggestions"}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
