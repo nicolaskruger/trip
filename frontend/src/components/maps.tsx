@@ -1,5 +1,5 @@
 import { GoogleMap, LoadScript } from "@react-google-maps/api";
-import { useEffect, useRef } from "react";
+import { HTMLProps, useEffect, useRef } from "react";
 
 const containerStyle = {
   width: "100%",
@@ -16,7 +16,7 @@ type Way = {
   destination: string;
 };
 
-const Maps = ({ origin, destination }: Way) => {
+const Maps = ({ origin, destination, onLoad }: HTMLProps<LoadScript> & Way) => {
   const mapRef = useRef<google.maps.Map>();
 
   useEffect(() => {
@@ -45,7 +45,10 @@ const Maps = ({ origin, destination }: Way) => {
   }, [origin, destination]);
 
   return (
-    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ""}>
+    <LoadScript
+      onLoad={onLoad}
+      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ""}
+    >
       <div className="">
         <GoogleMap
           mapContainerStyle={containerStyle}

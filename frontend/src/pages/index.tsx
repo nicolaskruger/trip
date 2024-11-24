@@ -1,7 +1,8 @@
 import { Maps } from "@/components/maps";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
-import { FormEvent, useCallback, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
+import { getGeocode } from "use-places-autocomplete";
 
 const BACKEND_URL = "http://localhost:8080/ride/";
 
@@ -106,14 +107,28 @@ export default function Home() {
     },
     [origin, destination, estimate, customer_id]
   );
+  const [maps, setMaps] = useState(false);
+
+  const [originSuggestions, setOriginSuggestion] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (maps)
+      (async () => {
+        const results = await getGeocode({ address: origin });
+        setOriginSuggestion(
+          results.map(({ formatted_address }) => formatted_address)
+        );
+        console.log(results);
+      })();
+  }, [origin, maps]);
 
   return (
-    <main>
-      <h1 className=" pl-3 py-5 text-xl">trip</h1>
+    <main className="px-3">
+      <h1 className=" py-5 text-xl">trip</h1>
       <form
         onSubmit={handleSubmit}
         action="submit"
-        className="px-3 flex flex-col space-y-2"
+        className=" flex flex-col space-y-2"
       >
         <label htmlFor="customer_id">customer_id:</label>
         <input
@@ -133,6 +148,9 @@ export default function Home() {
           className="text-slate-900"
           onChange={(e) => setOrigin(e.target.value)}
         />
+        {originSuggestions.map((suggestion) => (
+          <div key={suggestion}>{suggestion}</div>
+        ))}
         <label htmlFor="destination">destination:</label>
         <input
           type="text"
@@ -142,14 +160,14 @@ export default function Home() {
           className="text-slate-900"
           onChange={(e) => setDestination(e.target.value)}
         />
-        <Maps {...{ destination, origin }} />
+        <Maps onLoad={() => setMaps(true)} {...{ destination, origin }} />
         <button className="bg-pink-700">submit</button>
       </form>
       {loading && <p className="p-3 text-yellow-500">loading...</p>}
       {errorJ && <p className="text-red-700">error {errorJ}</p>}
       {estimate && (
         <>
-          <ul className="px-3 mt-2 space-y-2 mb-3">
+          <ul className=" mt-2 space-y-2 mb-3">
             {estimate?.options.map((driver) => {
               const {
                 id,
@@ -161,7 +179,7 @@ export default function Home() {
               return (
                 <li
                   key={id}
-                  className="rounded-xl bg-slate-100 flex justify-between items-center px-3 py-2"
+                  className="rounded-xl bg-slate-100 flex justify-between items-center  py-2"
                 >
                   <div>
                     <p className="text-slate-950 ">{name}</p>
