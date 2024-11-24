@@ -1,5 +1,6 @@
+import axios, { AxiosError } from "axios";
+import { error } from "console";
 import { useEffect, useRef, useState } from "react";
-import { getGeocode } from "use-places-autocomplete";
 
 const DEBOUNCE = 300;
 
@@ -12,11 +13,13 @@ export const useSuggestions = (value: string, ready: boolean) => {
       if (timeout.current) clearTimeout(timeout.current);
       timeout.current = setTimeout(async () => {
         try {
-          const results = await getGeocode({ address: value });
-          setSuggestions(
-            results.map(({ formatted_address }) => formatted_address)
-          );
+          console.log({ value });
+          const { data } = await axios.get(`/api/auto-complete?place=${value}`);
+          setSuggestions(data);
         } catch (error) {
+          if (error instanceof AxiosError) {
+            console.log(error.toJSON());
+          }
           setSuggestions([]);
         }
       }, DEBOUNCE);
