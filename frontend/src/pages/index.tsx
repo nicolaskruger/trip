@@ -220,7 +220,7 @@ export default function Home() {
       >
         <Loading loading={loading} />
       </div>
-      <ShowError className="mt-3 lg:hidden" error={errorJ} />
+      <ShowError className="mt-3 xl:hidden" error={errorJ} />
       {estimate && (
         <>
           <ul className=" mt-2 space-y-2 mb-3">
