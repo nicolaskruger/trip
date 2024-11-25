@@ -167,7 +167,11 @@ export default function Home() {
             <label htmlFor="destination">destination:</label>
             <InputSelector value={destination} setValue={setDestination} />
           </div>
-          <button className="bg-pink-700">submit</button>
+          <div className="flex flex-col">
+            <Loading loading={loading} />
+            <ShowError error={errorJ} />
+            <button className=" mt-2 bg-pink-700">submit</button>
+          </div>
         </div>
         <Maps className=" flex grow" {...{ destination, origin }} />
       </form>
@@ -188,10 +192,13 @@ export default function Home() {
     <main className="px-3 sm:px-0 sm:mx-auto sm:w-[600px] md:w-[700px] lg:w-[1000px]">
       <h1 className=" py-5 text-xl">trip</h1>
       {renderForm()}
-      <div data-show={loading} className="mt-3 data-[show=false]:hidden">
+      <div
+        data-show={loading}
+        className="mt-3 data-[show=false]:hidden lg:hidden"
+      >
         <Loading loading={loading} />
       </div>
-      <ShowError className="mt-3" error={errorJ} />
+      <ShowError className="mt-3 lg:hidden" error={errorJ} />
       {estimate && (
         <>
           <ul className=" mt-2 space-y-2 mb-3">
