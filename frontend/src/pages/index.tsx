@@ -124,23 +124,34 @@ export default function Home() {
         action="submit"
         className=" flex flex-col space-y-2"
       >
-        <label htmlFor="customer_id">customer_id:</label>
+        <label htmlFor="customer_id">customer</label>
         <input
           value={customer_id}
           onChange={(e) => setCustomer(e.target.value)}
           type="text"
           name="customer_id"
           id="customer_id"
-          className="text-slate-900"
+          className="text-slate-900 h-10 text-lg rounded-lg pl-2"
         />
         <label htmlFor="origin">origin:</label>
-        <InputSelector value={origin} setValue={setOrigin} />
+        <InputSelector
+          className="text-slate-900 h-10 text-lg rounded-lg pl-2"
+          value={origin}
+          setValue={setOrigin}
+        />
 
         <label htmlFor="destination">destination:</label>
-        <InputSelector value={destination} setValue={setDestination} />
-        <Maps className="h-64" {...{ destination, origin }} />
+        <InputSelector
+          className="text-slate-900 h-10 text-lg rounded-lg pl-2"
+          value={destination}
+          setValue={setDestination}
+        />
+        <Maps
+          className="h-64 rounded-lg overflow-hidden"
+          {...{ destination, origin }}
+        />
 
-        <button className="bg-pink-700">submit</button>
+        <button className="bg-pink-700 h-10 rounded-lg">submit</button>
       </form>
     );
 
