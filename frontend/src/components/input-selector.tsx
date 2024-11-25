@@ -1,10 +1,17 @@
 import { useSuggestions } from "@/hooks/use_suggestions";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  HTMLProps,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 
 export const InputSelector = ({
   value,
   setValue,
-}: {
+  ...props
+}: HTMLProps<HTMLInputElement> & {
   value: string;
   setValue: Dispatch<SetStateAction<string>>;
 }) => {
@@ -18,6 +25,7 @@ export const InputSelector = ({
   return (
     <div className="flex flex-col">
       <input
+        {...props}
         autoComplete="off"
         type="text"
         name="origin"

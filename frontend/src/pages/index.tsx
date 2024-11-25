@@ -2,9 +2,10 @@ import { InputSelector } from "@/components/input-selector";
 import { Loading } from "@/components/loading";
 import { Maps } from "@/components/maps";
 import { ResponseError, ShowError } from "@/components/show-error";
+import { Sizes, useMediaQuery } from "@/hooks/use_media_query";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
-import { FormEvent, useCallback, useState } from "react";
+import { FormEvent, ReactNode, useCallback, useState } from "react";
 
 const BACKEND_URL = "http://localhost:8080/ride/";
 
@@ -46,6 +47,10 @@ type Confirm = {
     name: string;
   };
   value: number;
+};
+
+type Dictionary<T extends string | symbol | number, U> = {
+  [K in T]: U;
 };
 
 export default function Home() {
@@ -110,9 +115,10 @@ export default function Home() {
     [origin, destination, estimate, customer_id, push]
   );
 
-  return (
-    <main className="px-3">
-      <h1 className=" py-5 text-xl">trip</h1>
+  const query = useMediaQuery();
+
+  const renderForm = () => {
+    const xs = () => (
       <form
         onSubmit={handleSubmit}
         action="submit"
@@ -132,11 +138,57 @@ export default function Home() {
 
         <label htmlFor="destination">destination:</label>
         <InputSelector value={destination} setValue={setDestination} />
-        <Maps {...{ destination, origin }} />
+        <Maps className="h-64" {...{ destination, origin }} />
 
         <button className="bg-pink-700">submit</button>
       </form>
-      <div data-show={!estimate} className="mt-3 data-[show=false]:hidden">
+    );
+
+    const md = () => (
+      <form
+        onSubmit={handleSubmit}
+        action="submit"
+        className=" flex  space-x-2"
+      >
+        <div className="flex flex-col w-5/12  h-96 justify-between">
+          <div className="flex flex-col space-y-2">
+            <label htmlFor="customer_id">customer_id:</label>
+            <input
+              value={customer_id}
+              onChange={(e) => setCustomer(e.target.value)}
+              type="text"
+              name="customer_id"
+              id="customer_id"
+              className="text-slate-900"
+            />
+            <label htmlFor="origin">origin:</label>
+            <InputSelector value={origin} setValue={setOrigin} />
+
+            <label htmlFor="destination">destination:</label>
+            <InputSelector value={destination} setValue={setDestination} />
+          </div>
+          <button className="bg-pink-700">submit</button>
+        </div>
+        <Maps className=" flex grow" {...{ destination, origin }} />
+      </form>
+    );
+
+    const dict: Dictionary<Sizes, () => ReactNode> = {
+      xs: xs,
+      sm: xs,
+      md: xs,
+      lg: md,
+      xl: md,
+      "2xl": md,
+    };
+    return dict[query]();
+  };
+
+  return (
+    <main className="px-3 sm:px-0 sm:mx-auto sm:w-[600px] md:w-[700px] lg:w-[1000px]">
+      <h1 className=" py-5 text-xl">trip</h1>
+      {renderForm()}
+      <div data-show={loading} className="mt-3 data-[show=false]:hidden">
         <Loading loading={loading} />
       </div>
       <ShowError className="mt-3" error={errorJ} />
