@@ -26,9 +26,11 @@ export const InputSelector = ({
   }, [suggestions]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col rounded-lg">
       <input
         {...props}
+        data-suggestion={suggestions.length > 0 && value !== suggestions[0]}
+        className={`${props.className} data-[suggestion=true]:rounded-b-none`}
         autoComplete="off"
         type="text"
         name="text"
@@ -59,7 +61,7 @@ export const InputSelector = ({
         }}
       />
       <div className="relative ">
-        <div className="absolute w-full z-10">
+        <div className="absolute w-full z-10 rounded-b-lg overflow-hidden ">
           {suggestions.map((suggestion, i) => (
             <button
               ref={(el) => {

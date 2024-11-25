@@ -135,7 +135,7 @@ export default function Home() {
         />
         <label htmlFor="origin">origin:</label>
         <InputSelector
-          className="text-slate-900 h-10 text-lg rounded-lg pl-2"
+          className="text-slate-900 h-10 text-lg rounded-lg pl-2 outline-none"
           value={origin}
           setValue={setOrigin}
         />
@@ -170,21 +170,32 @@ export default function Home() {
               type="text"
               name="customer_id"
               id="customer_id"
-              className="text-slate-900"
+              className="text-slate-900 h-10 text-lg rounded-lg pl-2"
             />
             <label htmlFor="origin">origin:</label>
-            <InputSelector value={origin} setValue={setOrigin} />
+            <InputSelector
+              className="text-slate-900 h-10 text-lg rounded-lg pl-2 outline-none"
+              value={origin}
+              setValue={setOrigin}
+            />
 
             <label htmlFor="destination">destination:</label>
-            <InputSelector value={destination} setValue={setDestination} />
+            <InputSelector
+              className="text-slate-900 h-10 text-lg rounded-lg pl-2 outline-none"
+              value={destination}
+              setValue={setDestination}
+            />
           </div>
           <div className="flex flex-col">
             <Loading loading={loading} />
             <ShowError error={errorJ} />
-            <button className=" mt-2 bg-pink-700">submit</button>
+            <button className="bg-pink-700 h-10 rounded-lg mt-2">submit</button>
           </div>
         </div>
-        <Maps className=" flex grow" {...{ destination, origin }} />
+        <Maps
+          className=" flex grow  rounded-lg overflow-hidden"
+          {...{ destination, origin }}
+        />
       </form>
     );
 
@@ -228,7 +239,7 @@ export default function Home() {
                 >
                   <div>
                     <p className="text-slate-950 ">{name}</p>
-                    <p className="text-green-600">$ {value}</p>
+                    <p className="text-green-600">$ {value.toFixed(2)}</p>
                     <p className="text-gray-500">vehicle: {vehicle}</p>
                     <p className="text-orange-600">{"☆".repeat(rating)}</p>
                   </div>
