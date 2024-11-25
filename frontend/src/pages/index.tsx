@@ -161,7 +161,7 @@ export default function Home() {
         action="submit"
         className=" flex  space-x-2"
       >
-        <div className="flex flex-col w-5/12  h-96 justify-between">
+        <div className="flex flex-col w-5/12  h-[450px] justify-between bg-slate-700 p-4 rounded-lg">
           <div className="flex flex-col space-y-2">
             <label htmlFor="customer_id">customer_id:</label>
             <input
@@ -203,7 +203,7 @@ export default function Home() {
       xs: xs,
       sm: xs,
       md: xs,
-      lg: md,
+      lg: xs,
       xl: md,
       "2xl": md,
     };
@@ -211,7 +211,7 @@ export default function Home() {
   };
 
   return (
-    <main className="px-3 sm:px-0 sm:mx-auto sm:w-[600px] md:w-[700px] lg:w-[1000px]">
+    <main className=" px-3 sm:px-0 sm:mx-auto sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[1000px]">
       <h1 className=" py-5 text-xl">trip</h1>
       {renderForm()}
       <div
@@ -245,7 +245,7 @@ export default function Home() {
                   </div>
 
                   <button
-                    className=" bg-gray-500 h-9 w-32 rounded-lg"
+                    className="bg-blue-500 h-9 w-32 rounded-lg"
                     onClick={() => confirm(driver)}
                   >
                     select

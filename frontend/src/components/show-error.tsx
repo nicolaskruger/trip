@@ -61,15 +61,15 @@ export const ShowError = ({
     e && (
       <div
         {...props}
-        className={`${props.className} rounded-xl p-3 bg-red-50 border-red-500 border flex flex-col space-y-2`}
+        className={`${props.className} rounded-xl p-3 bg-white border-red-500 border flex flex-col space-y-2`}
       >
         <div className=" flex justify-between rounded-xl items-center space-x-2">
-          <h1 className="text-red-500 ">
+          <h1 className="text-slate-950 ">
             {ERROR[e.error_code] || "Ops.."}{" "}
             <span className="p-1 font-bold">{e.error_description}</span>
           </h1>
           <div className="flex justify-end space-x-3 w-28">
-            <p className="text-red-500">{count} s</p>
+            <p className="text-slate-950">{count} s</p>
             <button
               className="text-xs flex justify-center items-center rounded-full p-0 text-red-50 bg-red-500 h-6 w-6"
               onClick={stopCounter}
