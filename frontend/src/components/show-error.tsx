@@ -1,8 +1,21 @@
 import { HTMLProps, useEffect, useRef, useState } from "react";
 
 export type ResponseError = {
-  error_code: string;
+  error_code:
+    | "INVALID_DATA"
+    | "DRIVER_NOT_FOUND"
+    | "INVALID_DISTANCE"
+    | "INVALID_DRIVER"
+    | "NO_RIDES_FOUND";
   error_description: string;
+};
+
+const ERROR = {
+  INVALID_DATA: `Something went wrong :( maybe something related with:`,
+  DRIVER_NOT_FOUND: "Something went wrong :( driver not found:",
+  INVALID_DISTANCE: "Something went wrong :( invalid distance:",
+  INVALID_DRIVER: "Something went wrong :( invalid driver:",
+  NO_RIDES_FOUND: "Something went wrong :( no rides found:",
 };
 
 export const ShowError = ({
@@ -48,21 +61,23 @@ export const ShowError = ({
     e && (
       <div
         {...props}
-        className={`${props.className} rounded-xl p-3 bg-red-900 flex flex-col space-y-2`}
+        className={`${props.className} rounded-xl p-3 bg-red-50 border-red-500 border flex flex-col space-y-2`}
       >
-        <div className="bg-red-600 p-3 flex justify-between rounded-xl items-center">
-          <h1>{e.error_code}</h1>
-          <div className="flex space-x-3">
-            <p>{count} s</p>
+        <div className=" flex justify-between rounded-xl items-center space-x-2">
+          <h1 className="text-red-500 ">
+            {ERROR[e.error_code] || "Ops.."}{" "}
+            <span className="p-1 font-bold">{e.error_description}</span>
+          </h1>
+          <div className="flex justify-end space-x-3 w-28">
+            <p className="text-red-500">{count} s</p>
             <button
-              className="text-xs flex justify-center items-center rounded-full p-0 bg-red-950 h-6 w-6"
+              className="text-xs flex justify-center items-center rounded-full p-0 text-red-50 bg-red-500 h-6 w-6"
               onClick={stopCounter}
             >
               ✖
             </button>
           </div>
         </div>
-        <p className="px-3">{e.error_description}</p>
       </div>
     )
   );
