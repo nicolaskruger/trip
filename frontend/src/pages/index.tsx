@@ -1,5 +1,6 @@
 import { InputSelector } from "@/components/input-selector";
 import { Maps } from "@/components/maps";
+import { ResponseError, ShowError } from "@/components/show-error";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { FormEvent, useCallback, useState } from "react";
@@ -55,7 +56,7 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false);
 
-  const [errorJ, setError] = useState("");
+  const [errorJ, setError] = useState<ResponseError>();
 
   const { push } = useRouter();
 
@@ -75,7 +76,7 @@ export default function Home() {
       if (error instanceof AxiosError) {
         console.log(error);
         setLoading(false);
-        setError(JSON.stringify(error.response?.data));
+        setError(error.response?.data);
       }
     }
   };
@@ -101,11 +102,11 @@ export default function Home() {
         if (error instanceof AxiosError) {
           console.log(error);
           setLoading(false);
-          setError(JSON.stringify(error.response?.data));
+          setError(error.response?.data);
         }
       }
     },
-    [origin, destination, estimate, customer_id]
+    [origin, destination, estimate, customer_id, push]
   );
 
   return (
@@ -135,7 +136,7 @@ export default function Home() {
         <button className="bg-pink-700">submit</button>
       </form>
       {loading && <p className="p-3 text-yellow-500">loading...</p>}
-      {errorJ && <p className="text-red-700">error {errorJ}</p>}
+      <ShowError className="mt-3" error={errorJ} />
       {estimate && (
         <>
           <ul className=" mt-2 space-y-2 mb-3">
