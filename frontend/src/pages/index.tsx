@@ -1,4 +1,5 @@
 import { InputSelector } from "@/components/input-selector";
+import { Loading } from "@/components/loading";
 import { Maps } from "@/components/maps";
 import { ResponseError, ShowError } from "@/components/show-error";
 import axios, { AxiosError } from "axios";
@@ -135,7 +136,9 @@ export default function Home() {
 
         <button className="bg-pink-700">submit</button>
       </form>
-      {loading && <p className="p-3 text-yellow-500">loading...</p>}
+      <div data-show={!estimate} className="mt-3 data-[show=false]:hidden">
+        <Loading loading={loading} />
+      </div>
       <ShowError className="mt-3" error={errorJ} />
       {estimate && (
         <>
@@ -151,7 +154,7 @@ export default function Home() {
               return (
                 <li
                   key={id}
-                  className="rounded-xl bg-slate-100 flex justify-between items-center  py-2"
+                  className="rounded-xl bg-slate-100 flex justify-between items-center  p-2"
                 >
                   <div>
                     <p className="text-slate-950 ">{name}</p>

@@ -1,4 +1,4 @@
-import { HTMLProps, useCallback, useEffect, useRef, useState } from "react";
+import { HTMLProps, useEffect, useRef, useState } from "react";
 
 export type ResponseError = {
   error_code: string;
