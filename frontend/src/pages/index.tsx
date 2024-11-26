@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Sizes, useMediaQuery } from "@/hooks/use_media_query";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
-import { FormEvent, ReactNode, useCallback, useState } from "react";
+import { FormEvent, MouseEvent, ReactNode, useCallback, useState } from "react";
 import { ArrowDownUpIcon, ArrowRight } from "lucide-react";
 
 const BACKEND_URL = "http://localhost:8080/ride/";
@@ -68,7 +68,9 @@ export default function Home() {
 
   const [errorJ, setError] = useState<ResponseError>();
 
-  const swapOriginDestination = (event: FormEvent<HTMLFormElement>) => {
+  const swapOriginDestination = (
+    event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+  ) => {
     event.preventDefault();
     event.stopPropagation();
     setDestination(origin);
@@ -157,7 +159,7 @@ export default function Home() {
               setValue={setDestination}
             />
           </div>
-          <Button variant={"default"} onClick={swapOriginDestination}>
+          <Button variant={"default"} onClick={(e) => swapOriginDestination(e)}>
             <ArrowDownUpIcon />
           </Button>
         </div>
