@@ -1,5 +1,9 @@
 # Trip
 
+## set up **.env**
+
+**create** an `.env` or **rename** `.env.sample` to `.env` **put** your `GOOGLE_API_KEY` on it
+
 ## start the project
 
 ```bash
