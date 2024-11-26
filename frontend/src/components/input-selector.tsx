@@ -1,4 +1,5 @@
 import { useSuggestions } from "@/hooks/use_suggestions";
+import { Input } from "./ui/input";
 import {
   HTMLProps,
   Dispatch,
@@ -27,7 +28,7 @@ export const InputSelector = ({
 
   return (
     <div className="flex flex-col rounded-lg">
-      <input
+      <Input
         {...props}
         data-suggestion={suggestions.length > 0 && value !== suggestions[0]}
         className={`${props.className} data-[suggestion=true]:rounded-b-none`}
@@ -69,7 +70,7 @@ export const InputSelector = ({
               }}
               key={suggestion}
               data-cursor={i === cursor}
-              className="min-h-10 text-lg data-[cursor=true]:bg-slate-400 py-0.5 text-left bg-slate-300 text-slate-900 invisible data-[show=false]:hidden data-[show=true]:visible hover:bg-slate-400 w-full"
+              className="pl-3 min-h-10  data-[cursor=true]:bg-slate-400 py-0.5 text-left bg-slate-300 text-slate-900 invisible data-[show=false]:hidden data-[show=true]:visible hover:bg-slate-400 w-full"
               data-show={!!suggestion && value !== suggestions[0]}
               onClick={(e) => {
                 e.stopPropagation();

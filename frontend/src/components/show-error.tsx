@@ -1,4 +1,6 @@
 import { HTMLProps, useEffect, useRef, useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export type ResponseError = {
   error_code:
@@ -11,11 +13,11 @@ export type ResponseError = {
 };
 
 const ERROR = {
-  INVALID_DATA: `Something went wrong :( maybe something related with:`,
-  DRIVER_NOT_FOUND: "Something went wrong :( driver not found:",
-  INVALID_DISTANCE: "Something went wrong :( invalid distance:",
-  INVALID_DRIVER: "Something went wrong :( invalid driver:",
-  NO_RIDES_FOUND: "Something went wrong :( no rides found:",
+  INVALID_DATA: `Something went wrong :( check your fields`,
+  DRIVER_NOT_FOUND: "Something went wrong :( driver not found",
+  INVALID_DISTANCE: "Something went wrong :( invalid distance",
+  INVALID_DRIVER: "Something went wrong :( invalid driver",
+  NO_RIDES_FOUND: "Something went wrong :( no rides found",
 };
 
 export const ShowError = ({
@@ -29,11 +31,6 @@ export const ShowError = ({
   const timeout = useRef<NodeJS.Timeout>();
 
   const [count, setCount] = useState(5);
-
-  const stopCounter = () => {
-    setE(undefined);
-    clearTimeout(timeout.current);
-  };
 
   useEffect(() => {
     if (count <= 0) {
@@ -59,26 +56,11 @@ export const ShowError = ({
 
   return (
     e && (
-      <div
-        {...props}
-        className={`${props.className} rounded-xl p-3 bg-white border-red-500 border flex flex-col space-y-2`}
-      >
-        <div className=" flex justify-between rounded-xl items-center space-x-2">
-          <h1 className="text-slate-950 ">
-            {ERROR[e.error_code] || "Ops.."}{" "}
-            <span className="p-1 font-bold">{e.error_description}</span>
-          </h1>
-          <div className="flex justify-end space-x-3 w-28">
-            <p className="text-slate-950">{count} s</p>
-            <button
-              className="text-xs flex justify-center items-center rounded-full p-0 text-red-50 bg-red-500 h-6 w-6"
-              onClick={stopCounter}
-            >
-              ✖
-            </button>
-          </div>
-        </div>
-      </div>
+      <Alert {...props} variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>{e.error_description}</AlertTitle>
+        <AlertDescription>{ERROR[e.error_code] || "Ops.."}</AlertDescription>
+      </Alert>
     )
   );
 };

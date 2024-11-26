@@ -2,10 +2,14 @@ import { InputSelector } from "@/components/input-selector";
 import { Loading } from "@/components/loading";
 import { Maps } from "@/components/maps";
 import { ResponseError, ShowError } from "@/components/show-error";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Sizes, useMediaQuery } from "@/hooks/use_media_query";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { FormEvent, ReactNode, useCallback, useState } from "react";
+import { ArrowDownUpIcon, ArrowRight } from "lucide-react";
 
 const BACKEND_URL = "http://localhost:8080/ride/";
 
@@ -63,6 +67,13 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const [errorJ, setError] = useState<ResponseError>();
+
+  const swapOriginDestination = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDestination(origin);
+    setOrigin(destination);
+  };
 
   const { push } = useRouter();
 
@@ -122,36 +133,40 @@ export default function Home() {
       <form
         onSubmit={handleSubmit}
         action="submit"
-        className=" flex flex-col space-y-2"
+        className=" flex flex-col space-y-4"
       >
-        <label htmlFor="customer_id">customer</label>
-        <input
+        <Label htmlFor="customer_id">customer</Label>
+        <Input
           value={customer_id}
           onChange={(e) => setCustomer(e.target.value)}
           type="text"
           name="customer_id"
           id="customer_id"
-          className="text-slate-900 h-10 text-lg rounded-lg pl-2"
         />
-        <label htmlFor="origin">origin:</label>
-        <InputSelector
-          className="text-slate-900 h-10 text-lg rounded-lg pl-2 outline-none"
-          value={origin}
-          setValue={setOrigin}
-        />
+        <div className="flex justify-center items-center w-full space-x-2">
+          <div className="w-full flex flex-col space-y-4">
+            <InputSelector
+              placeholder="origin"
+              value={origin}
+              setValue={setOrigin}
+            />
 
-        <label htmlFor="destination">destination:</label>
-        <InputSelector
-          className="text-slate-900 h-10 text-lg rounded-lg pl-2"
-          value={destination}
-          setValue={setDestination}
-        />
+            <InputSelector
+              placeholder="destination"
+              value={destination}
+              setValue={setDestination}
+            />
+          </div>
+          <Button variant={"default"} onClick={swapOriginDestination}>
+            <ArrowDownUpIcon />
+          </Button>
+        </div>
         <Maps
           className="h-64 rounded-lg overflow-hidden"
           {...{ destination, origin }}
         />
 
-        <button className="bg-pink-700 h-10 rounded-lg">submit</button>
+        <Button>submit</Button>
       </form>
     );
 
@@ -161,35 +176,39 @@ export default function Home() {
         action="submit"
         className=" flex  space-x-2"
       >
-        <div className="flex flex-col w-5/12  h-[450px] justify-between bg-slate-700 p-4 rounded-lg">
+        <div className="flex flex-col w-5/12  h-[450px] justify-between ">
           <div className="flex flex-col space-y-2">
-            <label htmlFor="customer_id">customer_id:</label>
-            <input
+            <Label htmlFor="customer_id">customer</Label>
+            <Input
               value={customer_id}
               onChange={(e) => setCustomer(e.target.value)}
               type="text"
               name="customer_id"
               id="customer_id"
-              className="text-slate-900 h-10 text-lg rounded-lg pl-2"
             />
-            <label htmlFor="origin">origin:</label>
-            <InputSelector
-              className="text-slate-900 h-10 text-lg rounded-lg pl-2 outline-none"
-              value={origin}
-              setValue={setOrigin}
-            />
+            <div className="flex justify-center items-center w-full space-x-2">
+              <div className="w-full flex flex-col space-y-4">
+                <InputSelector
+                  placeholder="origin"
+                  value={origin}
+                  setValue={setOrigin}
+                />
 
-            <label htmlFor="destination">destination:</label>
-            <InputSelector
-              className="text-slate-900 h-10 text-lg rounded-lg pl-2 outline-none"
-              value={destination}
-              setValue={setDestination}
-            />
+                <InputSelector
+                  placeholder="destination"
+                  value={destination}
+                  setValue={setDestination}
+                />
+              </div>
+              <Button variant={"default"} onClick={swapOriginDestination}>
+                <ArrowDownUpIcon />
+              </Button>
+            </div>
           </div>
           <div className="flex flex-col">
             <Loading loading={loading} />
             <ShowError error={errorJ} />
-            <button className="bg-pink-700 h-10 rounded-lg mt-2">submit</button>
+            <Button className=" mt-2">submit</Button>
           </div>
         </div>
         <Maps
@@ -216,7 +235,7 @@ export default function Home() {
       {renderForm()}
       <div
         data-show={loading}
-        className="mt-3 data-[show=false]:hidden lg:hidden"
+        className="mt-3 data-[show=false]:hidden xl:hidden"
       >
         <Loading loading={loading} />
       </div>
@@ -235,7 +254,7 @@ export default function Home() {
               return (
                 <li
                   key={id}
-                  className="rounded-xl bg-slate-100 flex justify-between items-center  p-2"
+                  className="rounded-xl bg-slate-100 flex justify-between items-center  p-2 border"
                 >
                   <div>
                     <p className="text-slate-950 ">{name}</p>
@@ -244,12 +263,13 @@ export default function Home() {
                     <p className="text-orange-600">{"☆".repeat(rating)}</p>
                   </div>
 
-                  <button
-                    className="bg-blue-500 h-9 w-32 rounded-lg"
+                  <Button
+                    className="mr-6"
+                    size={"icon"}
                     onClick={() => confirm(driver)}
                   >
-                    select
-                  </button>
+                    <ArrowRight />
+                  </Button>
                 </li>
               );
             })}
