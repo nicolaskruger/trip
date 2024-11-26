@@ -1,18 +1,18 @@
 # Use Node.js image
 FROM node:18-alpine
 
+
 # Set working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package.json yarn.lock ./
-RUN yarn install
+# Install dependencies
+RUN npm install -g npm@10.9.1
+COPY package*.json ./
+RUN npm install
 
-# Copy the rest of the application
+# Copy source code
 COPY . .
 
-# Expose the default Next.js port
+# Build the application
 EXPOSE 3000
-
-# Run the development server
-CMD ["yarn", "start:dev"]
+CMD [ "npm", "run", "start:dev" ]
