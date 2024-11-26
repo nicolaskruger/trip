@@ -22,9 +22,11 @@ const ERROR = {
 
 export const ShowError = ({
   error,
+  time_out,
   ...props
 }: {
   error?: ResponseError;
+  time_out?: boolean;
 } & HTMLProps<HTMLDivElement>) => {
   const [e, setE] = useState<ResponseError>();
 
@@ -51,8 +53,10 @@ export const ShowError = ({
 
   useEffect(() => {
     setE(error);
-    if (error) startCounter();
-  }, [error]);
+    if (error && time_out) {
+      startCounter();
+    }
+  }, [error, time_out]);
 
   return (
     e && (

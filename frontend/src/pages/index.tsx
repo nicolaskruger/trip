@@ -209,7 +209,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col">
             <Loading loading={loading} />
-            <ShowError error={errorJ} />
+            <ShowError time_out error={errorJ} />
             <Button className=" mt-2">submit</Button>
           </div>
         </div>
@@ -241,7 +241,7 @@ export default function Home() {
       >
         <Loading loading={loading} />
       </div>
-      <ShowError className="mt-3 xl:hidden" error={errorJ} />
+      <ShowError className="mt-3 xl:hidden" time_out error={errorJ} />
       {estimate && (
         <>
           <ul className=" mt-2 space-y-2 mb-3">

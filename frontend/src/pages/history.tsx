@@ -1,3 +1,9 @@
+import { Loading } from "@/components/loading";
+import { ResponseError, ShowError } from "@/components/show-error";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -42,14 +48,14 @@ export default function History() {
 
   const [loading, setLoading] = useState(false);
 
-  const [errorJ, setError] = useState("");
+  const [errorJ, setError] = useState<ResponseError>();
 
   const [filter, setFilter] = useState<string[]>([]);
 
   const getOperation = async (customer: string) => {
     try {
       setLoading(true);
-      setError("");
+      setError(undefined);
       const { data } = await axios.get<Operation>(`${BACKEND_URL}${customer}`);
       setOperation(data);
       setLoading(false);
@@ -58,7 +64,7 @@ export default function History() {
         console.log(error);
         setLoading(false);
         setOperation(undefined);
-        setError(JSON.stringify(error.response?.data));
+        setError(error.response?.data);
       }
     }
   };
@@ -77,24 +83,23 @@ export default function History() {
   };
 
   return (
-    <main className="px-3">
+    <main className="px-3 sm:px-0 sm:mx-auto sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[1000px]">
       <h1 className="py-5 text-xl">History</h1>
       <div className="flex flex-col space-y-3 mb-3">
-        <label htmlFor="customer_id">customer_id</label>
-        <input
+        <Label htmlFor="customer_id">customer</Label>
+        <Input
           type="text"
           name="customer_id"
           id="customer_id"
           value={customer}
-          className="text-slate-900"
           onChange={handleChange}
         />
       </div>
-      {loading && <p className="text-yellow-700">loading...</p>}
-      {errorJ && <p className="text-red-600">{errorJ}</p>}
+      <ShowError className="mb-2" error={errorJ} />
+      {loading && <Loading loading={loading} />}
       {operation && operation.rides && (
         <>
-          <ul className="flex space-x-2">
+          <ul className="flex space-x-2 mb-2">
             {operation.rides
               .reduce(
                 (acc, curr) =>
@@ -105,25 +110,23 @@ export default function History() {
               )
               .map((name) => (
                 <li key={name}>
-                  <button
-                    className="flex items-baseline space-x-2"
+                  <Button
+                    variant={"ghost"}
+                    className="flex items-center space-x-2"
                     onClick={() => {
                       if (filter.includes(name))
                         setFilter(filter.filter((val) => val !== name));
                       else setFilter([...filter, name]);
                     }}
                   >
-                    <div
-                      className=" w-3 bg-slate-50 h-3 rounded-sm data-[active=true]:bg-red-500"
-                      data-active={filter.includes(name)}
-                    ></div>
-                    <p>{name}</p>
-                  </button>
+                    <Checkbox checked={filter.includes(name)} />
+                    <Label>{name}</Label>
+                  </Button>
                 </li>
               ))}
-            <button className="text-purple-500" onClick={() => setFilter([])}>
+            <Button variant={"secondary"} onClick={() => setFilter([])}>
               clear filter
-            </button>
+            </Button>
           </ul>
           <ul className="flex flex-col space-y-2">
             {operation.rides
@@ -143,7 +146,10 @@ export default function History() {
                   duration,
                   value,
                 }) => (
-                  <li className="bg-slate-50 rounded-lg p-3 space-y-1" key={id}>
+                  <li
+                    className="bg-slate-50 rounded-lg p-3 space-y-1 border"
+                    key={id}
+                  >
                     <div className="flex justify-between">
                       <p className="text-slate-900">{name}</p>
                       <p className="text-slate-900">
