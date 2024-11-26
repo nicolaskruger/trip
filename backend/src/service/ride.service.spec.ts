@@ -1,5 +1,5 @@
 import { MapRoute, MapsRepository } from 'src/repository/maps.repository';
-import { Costumer, RideService } from './ride.service';
+import { Costumer, RideService, RidesQuery } from './ride.service';
 import { MongoTripRepository } from 'src/repository/mongo.trip.repository';
 import { Driver } from 'src/repository/schema/driver.schema';
 import { Document } from 'mongoose';
@@ -86,6 +86,11 @@ const getOrder = (): Order => ({
   value: 1250.75,
 });
 
+const getRidesQuery = (): RidesQuery => ({
+  customer_id: '1234',
+  driver_id: 2,
+});
+
 describe('ride test', () => {
   const mapRepository = jest.mocked({} as MapsRepository);
   const mongoTripRepository = jest.mocked({} as MongoTripRepository);
@@ -94,11 +99,15 @@ describe('ride test', () => {
   mongoTripRepository.findDriver = jest.fn();
   mongoTripRepository.updatePreOrder = jest.fn();
   mongoTripRepository.saveOrder = jest.fn();
+  mongoTripRepository.findDriverById = jest.fn();
+  mongoTripRepository.findOrderByRidesQuery = jest.fn();
 
   beforeEach(() => {
     mapRepository.calc.mockResolvedValue(getMapRoute());
     mongoTripRepository.pickDriver.mockResolvedValue([getDriver()]);
     mongoTripRepository.findDriver.mockResolvedValue(getDriver() as any);
+    mongoTripRepository.findDriverById.mockResolvedValue(getDriver() as any);
+    mongoTripRepository.findOrderByRidesQuery.mockResolvedValue([{}] as any);
   });
 
   afterEach(() => {
@@ -243,6 +252,55 @@ describe('ride test', () => {
         order.distance = 100000000;
         await rideService.confirm(order);
         expect(true).toBeTruthy();
+      } catch (error) {
+        expect(error).toBeFalsy();
+        expect(true).toBeFalsy();
+      }
+    });
+  });
+
+  describe('rides', () => {
+    it('empty customer', async () => {
+      try {
+        const query = getRidesQuery();
+        delete query.customer_id;
+        await rideService.rides(query);
+        expect(true).toBeFalsy();
+      } catch (error) {
+        expect(error.code).toBe(400);
+        expect(error.error_code).toBe('INVALID_DATA');
+      }
+    });
+    it('invalid driver', async () => {
+      try {
+        const query = getRidesQuery();
+        mongoTripRepository.findDriverById.mockResolvedValue(null);
+        await rideService.rides(query);
+        expect(true).toBeFalsy();
+      } catch (error) {
+        expect(error.code).toBe(400);
+        expect(error.error_code).toBe('INVALID_DRIVER');
+      }
+    });
+
+    it('no rides found', async () => {
+      try {
+        const query = getRidesQuery();
+        mongoTripRepository.findOrderByRidesQuery.mockResolvedValue([]);
+        await rideService.rides(query);
+        expect(true).toBeFalsy();
+      } catch (error) {
+        expect(error.code).toBe(404);
+        expect(error.error_code).toBe('NO_RIDES_FOUND');
+      }
+    });
+
+    it('no rides found', async () => {
+      try {
+        const query = getRidesQuery();
+        const resp = await rideService.rides(query);
+        expect(resp.customer_id).toBe(query.customer_id);
+        expect(resp.rides).toBeTruthy();
       } catch (error) {
         expect(error).toBeFalsy();
         expect(true).toBeFalsy();
