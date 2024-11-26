@@ -2,7 +2,6 @@ import { MapRoute, MapsRepository } from 'src/repository/maps.repository';
 import { Costumer, RideService, RidesQuery } from './ride.service';
 import { MongoTripRepository } from 'src/repository/mongo.trip.repository';
 import { Driver } from 'src/repository/schema/driver.schema';
-import { Document } from 'mongoose';
 
 const getDriver = (): Driver =>
   ({
